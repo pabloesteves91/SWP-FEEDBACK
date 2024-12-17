@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback System</title>
+    <style>
+        /* Allgemeine Stile */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+
+        header {
+            background-color: #e60000;
+            color: white;
+            text-align: center;
+            padding: 1em 0;
+        }
+
+        header #logo {
+            height: 60px;
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        main {
+            padding: 20px;
+            background-color: white;
+            max-width: 800px;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        section {
+            margin-bottom: 20px;
+        }
+
+        input, select {
+            width: calc(50% - 10px);
+            padding: 8px;
+            margin: 5px 5px 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #00529B;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #004080;
+        }
+
+        .slider-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .output-label {
+            font-weight: bold;
+            color: #e60000;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <header>
+        <img src="swissport-logo.png" alt="Swissport Logo" id="logo">
+        <h1>Feedback System</h1>
+    </header>
+    <main>
+        <!-- Schritt 1: Bewertungsart auswählen -->
+        <section id="initialSection">
+            <label for="evaluatorType">Wer bewertet wen?</label>
+            <select id="evaluatorType" required>
+                <option value="" disabled selected>Auswählen</option>
+                <option value="Mitarbeiter zu Supervisor">Mitarbeiter bewertet Supervisor</option>
+                <option value="Supervisor zu Mitarbeiter">Supervisor bewertet Mitarbeiter</option>
+            </select>
+            <button id="startBtn">Start</button>
+        </section>
+
+        <!-- Schritt 2: Verstecktes Formular -->
+        <form id="feedbackForm" style="display:none;">
+            <section>
+                <h3>Persönliche Informationen</h3>
+                <input type="text" id="firstName" placeholder="Vorname" required>
+                <input type="text" id="lastName" placeholder="Nachname" required>
+                <input type="number" id="employeeNumber" placeholder="Personalnummer" required>
+                <input type="date" id="evaluationDate" required>
+                <input type="text" id="evaluatorName" placeholder="Name des Bewertenden" required>
+            </section>
+
+            <section>
+                <h3>Bewertung</h3>
+                <div id="questions">
+                    <!-- Dynamische Fragen -->
+                </div>
+            </section>
+
+            <section>
+                <button type="button" id="calculateBtn">Auswertung anzeigen</button>
+                <button type="button" id="exportPDF">PDF Exportieren</button>
+            </section>
+        </form>
+
+        <div id="output"></div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const startBtn = document.getElementById("startBtn");
+            const initialSection = document.getElementById("initialSection");
+            const feedbackForm = document.getElementById("feedbackForm");
+            const questionsContainer = document.getElementById("questions");
+            const calculateBtn = document.getElementById("calculateBtn");
+            const exportBtn = document.getElementById("exportPDF");
+            const outputDiv = document.getElementById("output");
+
+            const questions = [
+                "Kommunikation", "Teamarbeit", "Zuverlässigkeit", "Pünktlichkeit",
+                "Engagement", "Fachkenntnisse", "Selbstständigkeit", "Kreativität",
+                "Problemlösung", "Führungskompetenz"
+            ];
+
+            startBtn.addEventListener("click", () => {
+                const evaluatorType = document.getElementById("evaluatorType").value;
+                if (!evaluatorType) {
+                    alert("Bitte Bewertungsart auswählen!");
+                    return;
+                }
+                initialSection.style.display = "none";
+                feedbackForm.style.display = "block";
+                generateSliders();
+            });
+
+            function generateSliders() {
+                questionsContainer.innerHTML = "";
+                questions.forEach((question, index) => {
+                    const sliderDiv = document.createElement("div");
+                    sliderDiv.classList.add("slider-container");
+
+                    sliderDiv.innerHTML = `
+                        <label>${index + 1}. ${question}:</label>
+                        <input type="range" min="1" max="5" value="3" class="slider" id="q${index + 1}">
+                        <span id="q${index + 1}-value">3</span>
+                    `;
+
+                    questionsContainer.appendChild(sliderDiv);
+
+                    sliderDiv.querySelector(".slider").addEventListener("input", (e) => {
+                        document.getElementById(`q${index + 1}-value`).innerText = e.target.value;
+                    });
+                });
+            }
+
+            calculateBtn.addEventListener("click", calculateAverage);
+
+            function calculateAverage() {
+                let total = 0;
+                const sliders = document.querySelectorAll(".slider");
+                sliders.forEach(slider => total += parseInt(slider.value));
+                const average = (total / sliders.length).toFixed(2);
+
+                outputDiv.innerHTML = `
+                    <p><strong>Durchschnittliche Bewertung:</strong> ${average}</p>
+                    <p class="output-label">${average >= 3 ? "Eher positiv" : "Eher negativ"}</p>
+                `;
+
+                return average;
+            }
+
+            exportBtn.addEventListener("click", exportToPDF);
+
+            function exportToPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                const evaluatorType = document.getElementById("evaluatorType").value;
+                const average = calculateAverage();
+
+                doc.text("Feedback Auswertung", 10, 10);
+                doc.text(`Bewertungsart: ${evaluatorType}`, 10, 20);
+                doc.text(`Durchschnitt: ${average}`, 10, 30);
+                doc.save("feedback.pdf");
+            }
+        });
+    </script>
+</body>
+</html>
