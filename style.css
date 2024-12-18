@@ -1,8 +1,10 @@
+/* Allgemeine Stile */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
+    background-color: #f8f8f9;
+    color: #333;
 }
 
 header {
@@ -13,7 +15,9 @@ header {
 }
 
 header img {
-    height: 80px;
+    height: 120px;
+    display: block;
+    margin: 0 auto;
 }
 
 main {
@@ -21,18 +25,19 @@ main {
     max-width: 800px;
     margin: 20px auto;
     background: white;
-    border-radius: 10px;
+    border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 h2, h3 {
     color: #333;
+    text-align: center;
 }
 
 input, select, textarea, button {
     display: block;
-    width: 100%;
-    margin: 10px 0;
+    width: calc(100% - 40px);
+    margin: 10px auto;
     padding: 10px;
     font-size: 16px;
     border-radius: 5px;
@@ -43,6 +48,8 @@ button {
     background-color: #00529B;
     color: white;
     cursor: pointer;
+    font-size: 16px;
+    padding: 10px;
 }
 
 button:hover {
@@ -51,4 +58,8 @@ button:hover {
 
 textarea {
     height: 100px;
+}
+
+section {
+    margin-bottom: 20px;
 }
