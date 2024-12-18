@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback System - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header>
+        <img src="swissport-logo.png" alt="Swissport Logo" id="logo">
+        <h1>Feedback Dashboard</h1>
+    </header>
+    <main>
+        <section id="userSection">
+            <h2>Willkommen, <span id="usernameDisplay"></span></h2>
+            <button id="logoutBtn">Logout</button>
+        </section>
+        <section id="feedbackSection">
+            <h3>Feedback Formular</h3>
+            <form id="feedbackForm">
+                <label for="feedbackType">Wer bewertet wen?</label>
+                <select id="feedbackType" required>
+                    <option value="" disabled selected>Auswählen</option>
+                    <option value="Mitarbeiter zu Supervisor">Mitarbeiter bewertet Supervisor</option>
+                    <option value="Supervisor zu Mitarbeiter">Supervisor bewertet Mitarbeiter</option>
+                </select>
+                <div id="questionsContainer">
+                    <!-- Dynamische Fragen -->
+                </div>
+                <label for="comments">Bemerkungen:</label>
+                <textarea id="comments" placeholder="Zusätzliche Kommentare"></textarea>
+                <button type="button" id="submitFeedback">Feedback speichern</button>
+                <button type="button" id="exportPDF">PDF Exportieren</button>
+            </form>
+        </section>
+        <section id="adminSection" style="display:none;">
+            <h3>Admin-Bereich</h3>
+            <div id="manageQuestions">
+                <h4>Fragen verwalten</h4>
+                <input type="text" id="newQuestion" placeholder="Neue Frage hinzufügen">
+                <button id="addQuestion">Hinzufügen</button>
+                <ul id="questionsList"></ul>
+            </div>
+        </section>
+        <section id="historySection">
+            <h3>Feedback-Verlauf</h3>
+            <ul id="feedbackHistory"></ul>
+        </section>
+    </main>
+</body>
+</html>
