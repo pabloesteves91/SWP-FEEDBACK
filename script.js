@@ -1,23 +1,12 @@
-let users = []; // Benutzerliste
-let feedbacks = []; // Feedbackliste
-let currentUser = null; // Aktuell eingeloggter Benutzer
-
 document.addEventListener("DOMContentLoaded", () => {
-    // Login-Funktionalität
-    const loginUsername = document.getElementById("loginUsername");
-    const loginPassword = document.getElementById("loginPassword");
-    const loginBtn = document.getElementById("loginBtn");
-    const loginError = document.getElementById("loginError");
-
-    // Dashboard-Elemente
+    const startBtn = document.getElementById("startBtn");
     const feedbackType = document.getElementById("feedbackType");
+    const feedbackForm = document.getElementById("feedbackForm");
     const questionsContainer = document.getElementById("questionsContainer");
     const submitFeedback = document.getElementById("submitFeedback");
     const exportPDF = document.getElementById("exportPDF");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const usernameDisplay = document.getElementById("usernameDisplay");
 
-    // Default-Fragen
+    // Standard-Fragen
     const questions = [
         "Kommunikation",
         "Teamarbeit",
@@ -31,95 +20,74 @@ document.addEventListener("DOMContentLoaded", () => {
         "Führungskompetenz"
     ];
 
-    // Benutzer aus JSON laden
-    fetch("users.json")
-        .then(response => response.json())
-        .then(data => {
-            users = data;
-        });
+    // Schritt 1: Feedback-Art auswählen
+    startBtn.addEventListener("click", () => {
+        const selectedType = feedbackType.value;
 
-    // Login-Funktion
-    if (loginBtn) {
-        loginBtn.addEventListener("click", () => {
-            const username = loginUsername.value.trim();
-            const password = loginPassword.value.trim();
-
-            const user = users.find(u => u.username === username && u.password === password);
-            if (user) {
-                currentUser = user;
-                localStorage.setItem("currentUser", JSON.stringify(user));
-                window.location.href = "dashboard.html";
-            } else {
-                loginError.style.display = "block";
-            }
-        });
-    }
-
-    // Dashboard-Funktionen
-    if (feedbackType) {
-        // Benutzer anzeigen
-        const storedUser = localStorage.getItem("currentUser");
-        if (storedUser) {
-            currentUser = JSON.parse(storedUser);
-            usernameDisplay.textContent = currentUser.username;
-        } else {
-            alert("Bitte einloggen!");
-            window.location.href = "index.html";
+        if (!selectedType) {
+            alert("Bitte wählen Sie aus, wer wen bewertet.");
+            return;
         }
 
-        // Logout
-        logoutBtn.addEventListener("click", () => {
-            localStorage.removeItem("currentUser");
-            window.location.href = "index.html";
-        });
-
-        // Fragen generieren
-        function generateQuestions() {
-            questionsContainer.innerHTML = "";
-            questions.forEach((question, index) => {
-                const questionDiv = document.createElement("div");
-                questionDiv.innerHTML = `
-                    <label>${index + 1}. ${question}</label>
-                    <input type="range" min="1" max="5" value="3" class="slider" id="q${index}">
-                `;
-                questionsContainer.appendChild(questionDiv);
-            });
-        }
-
-        // Initial generieren
+        document.getElementById("initialSection").style.display = "none";
+        feedbackForm.style.display = "block";
         generateQuestions();
+    });
 
-        // Feedback speichern
-        submitFeedback.addEventListener("click", () => {
-            const feedbackData = {
-                user: currentUser.username,
-                type: feedbackType.value,
-                date: new Date().toLocaleDateString(),
-                comments: document.getElementById("comments").value,
-                answers: Array.from(document.querySelectorAll(".slider")).map((slider, i) => ({
-                    question: questions[i],
-                    value: slider.value
-                }))
-            };
+    // Dynamisches Erstellen der Fragen
+    function generateQuestions() {
+        questionsContainer.innerHTML = "";
+        questions.forEach((question, index) => {
+            const questionDiv = document.createElement("div");
+            questionDiv.innerHTML = `
+                <label>${index + 1}. ${question}</label>
+                <input type="range" min="1" max="5" value="3" class="slider" id="q${index}">
+                <span id="q${index}-value">3</span>
+            `;
+            questionsContainer.appendChild(questionDiv);
 
-            feedbacks.push(feedbackData);
-            alert("Feedback gespeichert!");
-        });
-
-        // PDF-Export
-        exportPDF.addEventListener("click", () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            doc.text(`Feedback von ${currentUser.username}`, 10, 10);
-            doc.text(`Typ: ${feedbackType.value}`, 10, 20);
-
-            questions.forEach((question, i) => {
-                const value = document.getElementById(`q${i}`).value;
-                doc.text(`${i + 1}. ${question}: ${value}`, 10, 30 + i * 10);
+            // Aktualisieren des Werte-Anzeigers
+            const slider = questionDiv.querySelector(".slider");
+            const valueDisplay = questionDiv.querySelector(`#q${index}-value`);
+            slider.addEventListener("input", (e) => {
+                valueDisplay.textContent = e.target.value;
             });
-
-            doc.save("feedback.pdf");
         });
     }
+
+    // Feedback speichern (optional)
+    submitFeedback.addEventListener("click", () => {
+        alert("Feedback gespeichert! (Diese Funktion speichert lokal und kann später erweitert werden.)");
+    });
+
+    // PDF-Export
+    exportPDF.addEventListener("click", () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const selectedType = feedbackType.value;
+        const firstName = document.getElementById("firstName").value;
+        const lastName = document.getElementById("lastName").value;
+        const employeeNumber = document.getElementById("employeeNumber").value;
+        const evaluationDate = document.getElementById("evaluationDate").value;
+        const comments = document.getElementById("comments").value;
+
+        doc.text("Feedback Bericht", 10, 10);
+        doc.text(`Feedback-Typ: ${selectedType}`, 10, 20);
+        doc.text(`Vorname: ${firstName}`, 10, 30);
+        doc.text(`Nachname: ${lastName}`, 10, 40);
+        doc.text(`Personalnummer: ${employeeNumber}`, 10, 50);
+        doc.text(`Datum: ${evaluationDate}`, 10, 60);
+
+        let yOffset = 70;
+        questions.forEach((question, index) => {
+            const value = document.getElementById(`q${index}`).value;
+            doc.text(`${index + 1}. ${question}: ${value}`, 10, yOffset);
+            yOffset += 10;
+        });
+
+        doc.text(`Bemerkungen: ${comments}`, 10, yOffset);
+
+        doc.save("feedback.pdf");
+    });
 });
