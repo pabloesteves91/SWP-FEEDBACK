@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback System - Login</title>
+    <title>Feedback System</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
@@ -13,13 +13,40 @@
         <h1>Feedback System</h1>
     </header>
     <main>
-        <section id="loginSection">
-            <h2>Login</h2>
-            <input type="text" id="loginUsername" placeholder="Benutzername" required>
-            <input type="password" id="loginPassword" placeholder="Passwort" required>
-            <button id="loginBtn">Login</button>
-            <p id="loginError" style="color: red; display: none;">Ungültige Login-Daten</p>
+        <section id="initialSection">
+            <h2>Wer bewertet wen?</h2>
+            <select id="feedbackType" required>
+                <option value="" disabled selected>Auswählen</option>
+                <option value="Mitarbeiter zu Supervisor">Mitarbeiter bewertet Supervisor</option>
+                <option value="Supervisor zu Mitarbeiter">Supervisor bewertet Mitarbeiter</option>
+            </select>
+            <button id="startBtn">Weiter</button>
         </section>
+
+        <form id="feedbackForm" style="display:none;">
+            <section>
+                <h3>Persönliche Informationen</h3>
+                <input type="text" id="firstName" placeholder="Vorname" required>
+                <input type="text" id="lastName" placeholder="Nachname" required>
+                <input type="number" id="employeeNumber" placeholder="Personalnummer" required>
+                <input type="date" id="evaluationDate" required>
+            </section>
+
+            <section>
+                <h3>Bewertung</h3>
+                <div id="questionsContainer"></div>
+            </section>
+
+            <section>
+                <label for="comments">Bemerkungen:</label>
+                <textarea id="comments" placeholder="Zusätzliche Kommentare"></textarea>
+            </section>
+
+            <section>
+                <button type="button" id="submitFeedback">Feedback speichern</button>
+                <button type="button" id="exportPDF">PDF Exportieren</button>
+            </section>
+        </form>
     </main>
 </body>
 </html>
