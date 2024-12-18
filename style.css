@@ -1,10 +1,8 @@
-/* Allgemeine Stile */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f8f8f8;
-    color: #333;
+    background-color: #f4f4f9;
 }
 
 header {
@@ -14,43 +12,43 @@ header {
     padding: 1em 0;
 }
 
-header #logo {
-    height: 60px;
-    display: block;
-    margin: 0 auto 10px;
+header img {
+    height: 80px;
 }
 
 main {
     padding: 20px;
-    background-color: white;
     max-width: 800px;
     margin: 20px auto;
+    background: white;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-section {
-    margin-bottom: 20px;
+h2, h3, h4 {
+    color: #333;
 }
 
-input, select {
-    width: calc(50% - 10px);
-    padding: 8px;
-    margin: 5px 5px 10px 0;
-    border: 1px solid #ccc;
+input, select, textarea, button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 16px;
     border-radius: 5px;
+    border: 1px solid #ccc;
 }
 
 button {
     background-color: #00529B;
     color: white;
-    border: none;
-    padding: 10px 15px;
-    margin: 10px 5px;
     cursor: pointer;
-    border-radius: 5px;
 }
 
 button:hover {
-    background-color: #004080;
+    background-color: #003f7d;
+}
+
+textarea {
+    height: 100px;
 }
