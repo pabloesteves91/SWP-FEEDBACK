@@ -3,22 +3,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const feedbackType = document.getElementById("feedbackType");
     const feedbackForm = document.getElementById("feedbackForm");
     const questionsContainer = document.getElementById("questionsContainer");
-    const submitFeedback = document.getElementById("submitFeedback");
     const exportPDF = document.getElementById("exportPDF");
 
-    // Standard-Fragen
-    const questions = [
-        "Kommunikation",
-        "Teamarbeit",
-        "Zuverlässigkeit",
-        "Pünktlichkeit",
-        "Engagement",
-        "Fachkenntnisse",
-        "Selbstständigkeit",
-        "Kreativität",
-        "Problemlösung",
-        "Führungskompetenz"
-    ];
+    // Fragen basierend auf Feedback-Typ
+    const questionsOptions = {
+        "Mitarbeiter zu Supervisor": [
+            "Führungskompetenz",
+            "Kommunikation",
+            "Problemlösung",
+            "Motivation",
+            "Vertrauen"
+        ],
+        "Supervisor zu Mitarbeiter": [
+            "Teamarbeit",
+            "Pünktlichkeit",
+            "Zuverlässigkeit",
+            "Fachkenntnisse",
+            "Sicherheit"
+        ]
+    };
+
+    let selectedQuestions = [];
 
     // Schritt 1: Feedback-Art auswählen
     startBtn.addEventListener("click", () => {
@@ -29,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        selectedQuestions = questionsOptions[selectedType];
         document.getElementById("initialSection").style.display = "none";
         feedbackForm.style.display = "block";
         generateQuestions();
@@ -37,12 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Dynamisches Erstellen der Fragen
     function generateQuestions() {
         questionsContainer.innerHTML = "";
-        questions.forEach((question, index) => {
+        selectedQuestions.forEach((question, index) => {
             const questionDiv = document.createElement("div");
             questionDiv.innerHTML = `
                 <label>${index + 1}. ${question}</label>
                 <input type="range" min="1" max="5" value="3" class="slider" id="q${index}">
                 <span id="q${index}-value">3</span>
+                <textarea id="q${index}-comment" placeholder="Kommentar zu dieser Frage (optional)"></textarea>
             `;
             questionsContainer.appendChild(questionDiv);
 
@@ -55,38 +62,54 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Feedback speichern (optional)
-    submitFeedback.addEventListener("click", () => {
-        alert("Feedback gespeichert! (Diese Funktion speichert lokal und kann später erweitert werden.)");
-    });
-
     // PDF-Export
     exportPDF.addEventListener("click", () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
         const selectedType = feedbackType.value;
-        const firstName = document.getElementById("firstName").value;
-        const lastName = document.getElementById("lastName").value;
-        const employeeNumber = document.getElementById("employeeNumber").value;
+        const evaluatorFirstName = document.getElementById("evaluatorFirstName").value;
+        const evaluatorLastName = document.getElementById("evaluatorLastName").value;
+        const evaluatorEmployeeNumber = document.getElementById("evaluatorEmployeeNumber").value;
+        const evaluateeFirstName = document.getElementById("evaluateeFirstName").value;
+        const evaluateeLastName = document.getElementById("evaluateeLastName").value;
+        const evaluateeEmployeeNumber = document.getElementById("evaluateeEmployeeNumber").value;
         const evaluationDate = document.getElementById("evaluationDate").value;
-        const comments = document.getElementById("comments").value;
+        const generalComments = document.getElementById("generalComments").value;
+        const timestamp = new Date().toLocaleTimeString();
 
-        doc.text("Feedback Bericht", 10, 10);
-        doc.text(`Feedback-Typ: ${selectedType}`, 10, 20);
-        doc.text(`Vorname: ${firstName}`, 10, 30);
-        doc.text(`Nachname: ${lastName}`, 10, 40);
-        doc.text(`Personalnummer: ${employeeNumber}`, 10, 50);
-        doc.text(`Datum: ${evaluationDate}`, 10, 60);
+        let yOffset = 10;
 
-        let yOffset = 70;
-        questions.forEach((question, index) => {
+        doc.text("Feedback Bericht", 10, yOffset);
+        yOffset += 10;
+
+        doc.text(`Feedback-Typ: ${selectedType}`, 10, yOffset);
+        yOffset += 10;
+
+        doc.text(`Bewertender: ${evaluatorFirstName} ${evaluatorLastName} (${evaluatorEmployeeNumber})`, 10, yOffset);
+        yOffset += 10;
+
+        doc.text(`Zu Bewertender: ${evaluateeFirstName} ${evaluateeLastName} (${evaluateeEmployeeNumber})`, 10, yOffset);
+        yOffset += 10;
+
+        doc.text(`Datum: ${evaluationDate}`, 10, yOffset);
+        yOffset += 10;
+
+        doc.text(`Zeitstempel: ${timestamp}`, 10, yOffset);
+        yOffset += 10;
+
+        selectedQuestions.forEach((question, index) => {
             const value = document.getElementById(`q${index}`).value;
+            const comment = document.getElementById(`q${index}-comment`).value;
             doc.text(`${index + 1}. ${question}: ${value}`, 10, yOffset);
             yOffset += 10;
+            if (comment) {
+                doc.text(`Kommentar: ${comment}`, 20, yOffset);
+                yOffset += 10;
+            }
         });
 
-        doc.text(`Bemerkungen: ${comments}`, 10, yOffset);
+        doc.text(`Allgemeine Bemerkungen: ${generalComments}`, 10, yOffset);
 
         doc.save("feedback.pdf");
     });
