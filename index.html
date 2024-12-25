@@ -26,10 +26,17 @@
         <form id="feedbackForm" style="display:none;">
             <section>
                 <h3>Persönliche Informationen</h3>
-                <input type="text" id="firstName" placeholder="Vorname" required>
-                <input type="text" id="lastName" placeholder="Nachname" required>
-                <input type="number" id="employeeNumber" placeholder="Personalnummer" required>
+                <input type="text" id="evaluatorFirstName" placeholder="Ihr Vorname" required>
+                <input type="text" id="evaluatorLastName" placeholder="Ihr Nachname" required>
+                <input type="number" id="evaluatorEmployeeNumber" placeholder="Ihre Personalnummer" required>
                 <input type="date" id="evaluationDate" required>
+            </section>
+
+            <section>
+                <h3>Zu Bewertender</h3>
+                <input type="text" id="evaluateeFirstName" placeholder="Vorname des Bewerteten" required>
+                <input type="text" id="evaluateeLastName" placeholder="Nachname des Bewerteten" required>
+                <input type="number" id="evaluateeEmployeeNumber" placeholder="Personalnummer des Bewerteten" required>
             </section>
 
             <section>
@@ -38,12 +45,11 @@
             </section>
 
             <section>
-                <label for="comments">Bemerkungen:</label>
-                <textarea id="comments" placeholder="Zusätzliche Kommentare"></textarea>
+                <label for="generalComments">Allgemeine Bemerkungen (optional):</label>
+                <textarea id="generalComments" placeholder="Zusätzliche Kommentare"></textarea>
             </section>
 
             <section>
-                <button type="button" id="submitFeedback">Feedback speichern</button>
                 <button type="button" id="exportPDF">PDF Exportieren</button>
             </section>
         </form>
