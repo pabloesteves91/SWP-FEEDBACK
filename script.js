@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
         "evaluateeEmployeeNumber"
     ];
 
-    // Bewertungsfragen
     const questionsOptions = {
         "Mitarbeiter zu Supervisor": [
             "Führungskompetenz",
@@ -138,6 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         doc.text(`Allgemeine Bemerkungen: ${generalComments}`, 10, yOffset);
 
+        // PDF herunterladen
         doc.save("feedback.pdf");
     });
 });
