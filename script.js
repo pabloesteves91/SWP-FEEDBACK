@@ -5,7 +5,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const questionsContainer = document.getElementById("questionsContainer");
     const exportPDF = document.getElementById("exportPDF");
 
-    // Fragen basierend auf Feedback-Typ
+    const evaluatorFields = [
+        "evaluatorFirstName",
+        "evaluatorLastName",
+        "evaluatorEmployeeNumber",
+        "evaluationDate",
+        "evaluateeFirstName",
+        "evaluateeLastName",
+        "evaluateeEmployeeNumber"
+    ];
+
+    // Bewertungsfragen
     const questionsOptions = {
         "Mitarbeiter zu Supervisor": [
             "Führungskompetenz",
@@ -61,6 +71,23 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
+
+    // Pflichtfeldprüfung
+    function validateFields() {
+        let allValid = true;
+        evaluatorFields.forEach((fieldId) => {
+            const field = document.getElementById(fieldId);
+            if (!field.value || (fieldId.includes("EmployeeNumber") && field.value.length !== 6)) {
+                allValid = false;
+            }
+        });
+        exportPDF.disabled = !allValid;
+    }
+
+    evaluatorFields.forEach((fieldId) => {
+        const field = document.getElementById(fieldId);
+        field.addEventListener("input", validateFields);
+    });
 
     // PDF-Export
     exportPDF.addEventListener("click", () => {
