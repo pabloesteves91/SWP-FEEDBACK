@@ -104,40 +104,44 @@ document.addEventListener("DOMContentLoaded", () => {
         const generalComments = document.getElementById("generalComments").value;
         const timestamp = new Date().toLocaleTimeString();
 
-        let yOffset = 10;
+        let yOffset = 20;
 
-        doc.text("Feedback Bericht", 10, yOffset);
+        doc.setFontSize(20);
+        doc.text("SWP Feedback", 105, yOffset, { align: "center" });
+        yOffset += 20;
+
+        doc.addImage("swissport-logo.png", "PNG", 80, 10, 50, 20);
+
+        doc.setFontSize(12);
+        doc.text(`Feedback-Typ: ${selectedType}`, 20, yOffset);
         yOffset += 10;
 
-        doc.text(`Feedback-Typ: ${selectedType}`, 10, yOffset);
+        doc.text(`Bewertender: ${evaluatorFirstName} ${evaluatorLastName} (${evaluatorEmployeeNumber})`, 20, yOffset);
         yOffset += 10;
 
-        doc.text(`Bewertender: ${evaluatorFirstName} ${evaluatorLastName} (${evaluatorEmployeeNumber})`, 10, yOffset);
+        doc.text(`Zu Bewertender: ${evaluateeFirstName} ${evaluateeLastName} (${evaluateeEmployeeNumber})`, 20, yOffset);
         yOffset += 10;
 
-        doc.text(`Zu Bewertender: ${evaluateeFirstName} ${evaluateeLastName} (${evaluateeEmployeeNumber})`, 10, yOffset);
+        doc.text(`Datum: ${evaluationDate}`, 20, yOffset);
         yOffset += 10;
 
-        doc.text(`Datum: ${evaluationDate}`, 10, yOffset);
-        yOffset += 10;
-
-        doc.text(`Zeitstempel: ${timestamp}`, 10, yOffset);
-        yOffset += 10;
+        doc.text(`Zeitstempel: ${timestamp}`, 20, yOffset);
+        yOffset += 20;
 
         selectedQuestions.forEach((question, index) => {
             const value = document.getElementById(`q${index}`).value;
             const comment = document.getElementById(`q${index}-comment`).value;
-            doc.text(`${index + 1}. ${question}: ${value}`, 10, yOffset);
+            doc.text(`${index + 1}. ${question}: ${value}`, 20, yOffset);
             yOffset += 10;
             if (comment) {
-                doc.text(`Kommentar: ${comment}`, 20, yOffset);
+                doc.text(`Kommentar: ${comment}`, 30, yOffset);
                 yOffset += 10;
             }
         });
 
-        doc.text(`Allgemeine Bemerkungen: ${generalComments}`, 10, yOffset);
+        doc.text(`Allgemeine Bemerkungen: ${generalComments}`, 20, yOffset);
 
-        // PDF herunterladen
-        doc.save("feedback.pdf");
+        const fileName = `feedback-${evaluateeFirstName}-${evaluateeLastName}.pdf`;
+        doc.save(fileName);
     });
 });
