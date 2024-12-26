@@ -106,11 +106,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let yOffset = 20;
 
+        // Logo oben rechts platzieren
+        const logoWidth = 50; // Breite des Logos
+        const logoHeight = 20; // Höhe des Logos
+        doc.addImage("swissport-logo.png", "PNG", 150, 10, logoWidth, logoHeight);
+
+        // Titel und allgemeine Informationen
         doc.setFontSize(20);
         doc.text("SWP Feedback", 105, yOffset, { align: "center" });
         yOffset += 20;
-
-        doc.addImage("swissport-logo.png", "PNG", 80, 10, 50, 20);
 
         doc.setFontSize(12);
         doc.text(`Feedback-Typ: ${selectedType}`, 20, yOffset);
@@ -128,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
         doc.text(`Zeitstempel: ${timestamp}`, 20, yOffset);
         yOffset += 20;
 
+        // Bewertungsfragen
         selectedQuestions.forEach((question, index) => {
             const value = document.getElementById(`q${index}`).value;
             const comment = document.getElementById(`q${index}-comment`).value;
@@ -139,8 +144,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
+        // Allgemeine Bemerkungen
         doc.text(`Allgemeine Bemerkungen: ${generalComments}`, 20, yOffset);
 
+        // Dynamischer Dateiname
         const fileName = `feedback-${evaluateeFirstName}-${evaluateeLastName}.pdf`;
         doc.save(fileName);
     });
