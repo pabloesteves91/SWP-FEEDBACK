@@ -3,57 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SWP Feedback</title>
+    <title>SWP Feedback Tool</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- jsPDF autoTable Plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <script src="script.js" defer></script>
 </head>
 <body>
-    <header>
-        <img src="swissport-logo.png" alt="Swissport Logo" id="logo">
-        <h1>SWP Feedback</h1>
-    </header>
-    <main>
-        <section id="initialSection">
-            <h2>Wer bewertet wen?</h2>
-            <select id="feedbackType" required>
-                <option value="" disabled selected>Auswählen</option>
-                <option value="Mitarbeiter zu Supervisor">Mitarbeiter bewertet Supervisor</option>
-                <option value="Supervisor zu Mitarbeiter">Supervisor bewertet Mitarbeiter</option>
-            </select>
-            <button id="startBtn">Weiter</button>
+    <div class="container">
+        <header class="app-header">
+            <img src="swissport-logo.png" alt="Swissport Logo" class="logo">
+            <h1>SWP Feedback Portal</h1>
+        </header>
+
+        <section id="initialSection" class="card">
+            <div class="form-group">
+                <label>Wer bewertet wen?</label>
+                <select id="feedbackType" class="modern-select">
+                    <option value="">Bitte auswählen</option>
+                    <option value="Mitarbeiter zu Supervisor">Mitarbeiter → Supervisor</option>
+                    <option value="Supervisor zu Mitarbeiter">Supervisor → Mitarbeiter</option>
+                </select>
+            </div>
+            <button id="startBtn" class="primary-btn">Starten</button>
         </section>
 
-        <form id="feedbackForm" style="display:none;">
-            <section>
-                <h3>Persönliche Informationen</h3>
-                <input type="text" id="evaluatorFirstName" placeholder="Ihr Vorname" required>
-                <input type="text" id="evaluatorLastName" placeholder="Ihr Nachname" required>
-                <input type="number" id="evaluatorEmployeeNumber" placeholder="Ihre 6-stellige Personalnummer" required>
-                <input type="date" id="evaluationDate" required>
-            </section>
+        <form id="feedbackForm" class="card" style="display: none;">
+            <!-- Evaluator Section -->
+            <div class="form-section">
+                <h2>Bewertende Person</h2>
+                <div class="form-grid">
+                    <input type="text" id="evaluatorFirstName" placeholder="Vorname" class="modern-input" required>
+                    <input type="text" id="evaluatorLastName" placeholder="Nachname" class="modern-input" required>
+                    <input type="number" id="evaluatorEmployeeNumber" placeholder="Personalnummer (6-stellig)" 
+                           class="modern-input" pattern="\d{6}" required>
+                    <input type="date" id="evaluationDate" class="modern-input" required>
+                </div>
+            </div>
 
-            <section>
-                <h3>Zu Bewertender</h3>
-                <input type="text" id="evaluateeFirstName" placeholder="Vorname des Bewerteten" required>
-                <input type="text" id="evaluateeLastName" placeholder="Nachname des Bewerteten" required>
-                <input type="number" id="evaluateeEmployeeNumber" placeholder="6-stellige Personalnummer des Bewerteten" required>
-            </section>
+            <!-- Evaluatee Section -->
+            <div class="form-section">
+                <h2>Zu bewertende Person</h2>
+                <div class="form-grid">
+                    <input type="text" id="evaluateeFirstName" placeholder="Vorname" class="modern-input" required>
+                    <input type="text" id="evaluateeLastName" placeholder="Nachname" class="modern-input" required>
+                    <input type="number" id="evaluateeEmployeeNumber" placeholder="Personalnummer (6-stellig)" 
+                           class="modern-input" pattern="\d{6}" required>
+                </div>
+            </div>
 
-            <section>
-                <h3>Bewertung</h3>
-                <div id="questionsContainer"></div>
-            </section>
+            <!-- Questions Container -->
+            <div id="questionsContainer" class="questions-section"></div>
 
-            <section>
-                <label for="generalComments">Allgemeine Bemerkungen (optional):</label>
-                <textarea id="generalComments" placeholder="Zusätzliche Kommentare"></textarea>
-            </section>
+            <!-- General Comments -->
+            <div class="form-section">
+                <h2>Allgemeine Bemerkungen</h2>
+                <textarea id="generalComments" class="modern-textarea" 
+                          placeholder="Zusätzliche Kommentare oder Anmerkungen..."></textarea>
+            </div>
 
-            <section>
-                <button type="button" id="exportPDF" disabled>PDF Exportieren</button>
-            </section>
+            <button type="button" id="exportPDF" class="primary-btn" disabled>PDF erstellen</button>
         </form>
-    </main>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
