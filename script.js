@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
         questionsContainer.innerHTML = "";
         selectedQuestions.forEach((question, index) => {
             const questionDiv = document.createElement("div");
+            questionDiv.className = "question-item";
             questionDiv.innerHTML = `
                 <label>${index + 1}. ${question}</label>
                 <input type="range" min="1" max="5" value="3" class="slider" id="q${index}">
@@ -88,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         field.addEventListener("input", validateFields);
     });
 
-    // PDF-Export
+    // PDF-Export mit jsPDF und autoTable
     exportPDF.addEventListener("click", () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -102,53 +103,63 @@ document.addEventListener("DOMContentLoaded", () => {
         const evaluateeEmployeeNumber = document.getElementById("evaluateeEmployeeNumber").value;
         const evaluationDate = document.getElementById("evaluationDate").value;
         const generalComments = document.getElementById("generalComments").value;
-        const timestamp = new Date().toLocaleTimeString();
 
-        let yOffset = 20;
+        // PDF-Header mit Logo
+        doc.addImage("swissport-logo.png", "PNG", 15, 10, 40, 15);
+        doc.setFontSize(22);
+        doc.setTextColor(40, 40, 40);
+        doc.text("Feedback Report", 105, 20, { align: "center" });
 
-        // Logo oben rechts platzieren
-        const logoWidth = 50; // Breite des Logos
-        const logoHeight = 20; // Höhe des Logos
-        doc.addImage("swissport-logo.png", "PNG", 150, 10, logoWidth, logoHeight);
+        // Meta-Daten Tabelle
+        doc.autoTable({
+            startY: 35,
+            head: [['Kategorie', 'Details']],
+            body: [
+                ['Feedback-Typ', selectedType],
+                ['Bewertende Person', `${evaluatorFirstName} ${evaluatorLastName} (${evaluatorEmployeeNumber})`],
+                ['Zu Bewertende Person', `${evaluateeFirstName} ${evaluateeLastName} (${evaluateeEmployeeNumber})`],
+                ['Datum der Bewertung', evaluationDate],
+                ['Erstellt am', new Date().toLocaleDateString('de-CH')]
+            ],
+            theme: 'grid',
+            styles: { fontSize: 10 },
+            headStyles: { fillColor: [0, 123, 255] }
+        });
 
-        // Titel und allgemeine Informationen
-        doc.setFontSize(20);
-        doc.text("SWP Feedback", 105, yOffset, { align: "center" });
-        yOffset += 20;
+        // Bewertungstabelle
+        const questionsData = selectedQuestions.map((question, index) => ({
+            Frage: `${index + 1}. ${question}`,
+            Bewertung: document.getElementById(`q${index}`).value,
+            Kommentar: document.getElementById(`q${index}-comment`).value || '-'
+        }));
 
-        doc.setFontSize(12);
-        doc.text(`Feedback-Typ: ${selectedType}`, 20, yOffset);
-        yOffset += 10;
-
-        doc.text(`Bewertender: ${evaluatorFirstName} ${evaluatorLastName} (${evaluatorEmployeeNumber})`, 20, yOffset);
-        yOffset += 10;
-
-        doc.text(`Zu Bewertender: ${evaluateeFirstName} ${evaluateeLastName} (${evaluateeEmployeeNumber})`, 20, yOffset);
-        yOffset += 10;
-
-        doc.text(`Datum: ${evaluationDate}`, 20, yOffset);
-        yOffset += 10;
-
-        doc.text(`Zeitstempel: ${timestamp}`, 20, yOffset);
-        yOffset += 20;
-
-        // Bewertungsfragen
-        selectedQuestions.forEach((question, index) => {
-            const value = document.getElementById(`q${index}`).value;
-            const comment = document.getElementById(`q${index}-comment`).value;
-            doc.text(`${index + 1}. ${question}: ${value}`, 20, yOffset);
-            yOffset += 10;
-            if (comment) {
-                doc.text(`Kommentar: ${comment}`, 30, yOffset);
-                yOffset += 10;
-            }
+        doc.autoTable({
+            startY: doc.lastAutoTable.finalY + 15,
+            columns: [
+                { header: 'Frage', dataKey: 'Frage' },
+                { header: 'Bewertung (1-5)', dataKey: 'Bewertung' },
+                { header: 'Kommentar', dataKey: 'Kommentar' }
+            ],
+            body: questionsData,
+            styles: { fontSize: 9 },
+            columnStyles: { Kommentar: { cellWidth: 80 } },
+            theme: 'striped'
         });
 
         // Allgemeine Bemerkungen
-        doc.text(`Allgemeine Bemerkungen: ${generalComments}`, 20, yOffset);
+        doc.setFontSize(12);
+        doc.text(`Allgemeine Bemerkungen:`, 15, doc.lastAutoTable.finalY + 15);
+        doc.setFont("helvetica", "normal");
+        doc.text(generalComments || '-', 15, doc.lastAutoTable.finalY + 25, { maxWidth: 180 });
 
-        // Dynamischer Dateiname
-        const fileName = `feedback-${evaluateeFirstName}-${evaluateeLastName}.pdf`;
+        // Footer
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text(`Erstellt mit SWP Feedback Tool • ${new Date().toLocaleString('de-CH')}`, 
+                105, 280, { align: "center" });
+
+        // PDF speichern
+        const fileName = `Feedback_${evaluateeLastName}_${new Date().toISOString().slice(0,10)}.pdf`;
         doc.save(fileName);
     });
 });
